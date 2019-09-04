@@ -6,7 +6,7 @@ This function is part of a workaround for kubernetes' aws-alb-ingress-controller
 This is to be used with ALB + nodeport setup.
 
 This will do 2 things:
-1. Label nodes in Kubernetes with `alpha.service-controller.kubernetes.io/exclude-balancer: true`, so they the aws-alb-ingress-controller will not add them back to the loadbalancer during shutdown.
+1. Label nodes in Kubernetes with `alpha.service-controller.kubernetes.io/exclude-balancer: true`, so the aws-alb-ingress-controller will not add them back to the loadbalancer during shutdown.
 2. Deregisters the instance from ALB to trigger 'draining' state and be removed gracefuly.
 
 This should be triggered on lifecycle-hooks configured in the Autoscaler Group in AWS.
