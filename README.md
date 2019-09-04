@@ -1,7 +1,7 @@
 # kube_alb_lambda_deregister
 Lambda function that gracefully deregisters instances from ALB prior to shutdown.
 
-This function is part of a workaround for kubernetes' aws-alb-ingress-controller's inability to deregister instances from ALB in time when CA scales down, resulting in 502's to the clients in the period between instance shutdown and ALB halthchecks failure.
+This function is part of a workaround for kubernetes' aws-alb-ingress-controller not deregistering instances from ALB in time when CA scales down, resulting in 502's to the clients in the period between instance shutdown and ALB halthchecks failure.
 
 This is to be used with ALB + nodeport setup.
 
