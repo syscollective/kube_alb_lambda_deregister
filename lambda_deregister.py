@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     elbclient = boto3.client('elbv2')
 
     tg_arns = environ['TG_ARN']
-    ports = int(environ['INSTANCE_PORT'])
+    ports = environ['INSTANCE_PORT']
     kube_conf.host = environ['KUBE_HOST']
     kube_token = environ['KUBE_TOKEN']
 
@@ -47,6 +47,7 @@ def lambda_handler(event, context):
         response_kube = kube_api_v1.patch_node(nodename, body)
     except Exception as e:
         print(e)
+        exit(1)
     duration = time() - start
 
     print('kube api call took ',)
@@ -56,7 +57,7 @@ def lambda_handler(event, context):
 
     i=0
     for tg_arn in tg_arns.split(','):
-        port = ports.split(',')[i] 
+        port = int(ports.split(',')[i])
         i += 1
         print("Deregistering instance " + instance + " port " + str(port) + " from TG " + tg_arn)
         start = time()
