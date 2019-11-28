@@ -10,8 +10,8 @@ def lambda_handler(event, context):
     ec2client = boto3.client('ec2')
     elbclient = boto3.client('elbv2')
 
-    tg_arn = environ['TG_ARN']
-    port = int(environ['INSTANCE_PORT'])
+    tg_arns = environ['TG_ARN']
+    ports = environ['INSTANCE_PORT']
     kube_conf.host = environ['KUBE_HOST']
     kube_token = environ['KUBE_TOKEN']
 
@@ -47,6 +47,7 @@ def lambda_handler(event, context):
         response_kube = kube_api_v1.patch_node(nodename, body)
     except Exception as e:
         print(e)
+        exit(1)
     duration = time() - start
 
     print('kube api call took ',)
@@ -54,24 +55,28 @@ def lambda_handler(event, context):
     #print(response_kube)
 
 
-    print("Deregistering instance " + instance + " port " + str(port) + " from TG " + tg_arn)
-    start = time()
-    try:
-        response_aws = elbclient.deregister_targets(
-            TargetGroupArn=tg_arn,
-            Targets=[
-                {
-                    'Id': instance,
-                    'Port': port
-                }
-            ]
-        )
-    except Exception as e:
-        print(e)
-    duration = time() - start
-    print('elb.deregister took ',)
-    print(duration)
-    #print(response_aws)
+    i=0
+    for tg_arn in tg_arns.split(','):
+        port = int(ports.split(',')[i])
+        i += 1
+        print("Deregistering instance " + instance + " port " + str(port) + " from TG " + tg_arn)
+        start = time()
+        try:
+            response_aws = elbclient.deregister_targets(
+                TargetGroupArn=tg_arn,
+                Targets=[
+                    {
+                        'Id': instance,
+                        'Port': port
+                    }
+                ]
+            )
+        except Exception as e:
+            print(e)
+        duration = time() - start
+        print('elb.deregister took ',)
+        print(duration)
+        #print(response_aws)
     return None
 
 if __name__ == '__main__':
